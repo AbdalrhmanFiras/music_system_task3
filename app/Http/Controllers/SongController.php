@@ -65,9 +65,7 @@ class SongController extends Controller
             if (! empty($data['cover'])) {
                 Storage::disk('public')->delete($data['cover']);
             }
-            if (! empty($data['file_path'])) {
-                Storage::disk('public')->delete($data['file_path']);
-            }
+            Storage::disk('public')->delete($data['file_path']);
             abort(500, 'Something went wrong');
         }
     }
