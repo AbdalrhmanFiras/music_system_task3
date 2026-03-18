@@ -11,7 +11,7 @@ class UserController extends Controller
     public function userImportFile(UserImportRequest $request)
     {
         $request->validated();
-        Excel::import(new UserImport, $request->file('file'));
+        Excel::queueImport(new UserImport, $request->file('file'));
 
         return response()->json(['message' => 'File imported successfully'], 200);
     }
