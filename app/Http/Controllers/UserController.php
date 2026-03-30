@@ -8,7 +8,12 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
-    public function userImportFile(UserImportRequest $request)
+    public function __construct()
+    {
+        $this->middleware('permission:import-file', ['only' => ['userImportFile']]);
+    }
+
+    public function userImportFile(UserImportRequest $request) // admin
     {
         $request->validated();
         Excel::queueImport(new UserImport, $request->file('file'));

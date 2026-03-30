@@ -13,6 +13,15 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class SongController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:create-song', ['only' => ['store']]);
+        $this->middleware('permission:update-song', ['only' => ['update']]);
+        $this->middleware('permission:delete-song', ['only' => ['delete']]);
+        $this->middleware('permission:view-song', ['only' => ['show']]);
+        $this->middleware('permission:show-all-song', ['only' => ['index']]);
+    }
+
     public function find($songId)
     {
         $song = Song::find($songId);
@@ -70,7 +79,7 @@ class SongController extends Controller
         }
     }
 
-    public function store(StoreSongRequest $request)
+    public function store(StoreSongRequest $request) // admin
     {
         $this->handleSong($request, null);
 
@@ -85,7 +94,7 @@ class SongController extends Controller
 
     }
 
-    public function show($songId)
+    public function show($songId) // both
     {
         $song = Song::with(['artists', 'categories'])->find($songId);
         if (! $song) {
@@ -96,14 +105,14 @@ class SongController extends Controller
 
     }
 
-    public function index(GetSongRequest $request)
+    public function index(GetSongRequest $request) // both
     {
         $songs = Song::search($request->search)->paginate(10);
 
         return SongResource::collection($songs);
     }
 
-    public function delete($songId)
+    public function delete($songId) // admin
     {
         $song = $this->find($songId);
         if ($song->cover) {

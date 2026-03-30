@@ -10,6 +10,15 @@ use App\Models\Artist;
 
 class ArtistController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:create-artist', ['only' => ['store']]);
+        $this->middleware('permission:update-artist', ['only' => ['update']]);
+        $this->middleware('permission:view-artist', ['only' => ['show']]);
+        $this->middleware('permission:show-all-artist', ['only' => ['index']]);
+        $this->middleware('permission:delete-artist', ['only' => ['delete']]);
+    }
+
     public function find($artistId)
     {
         $artist = Artist::where('id', $artistId)->first();
@@ -20,28 +29,28 @@ class ArtistController extends Controller
         return $artist;
     }
 
-    public function store(StoreArtistRequest $request)
+    public function store(StoreArtistRequest $request) // admin
     {
         $artist = Artist::create($request->validated());
 
         return response()->json(['message' => 'Artist created successfully'], 201);
     }
 
-    public function index(GetArtistRequest $request)
+    public function index(GetArtistRequest $request) // both
     {
         $artist = Artist::search($request->search)->paginate(10);
 
         return response()->json(['data' => ArtistResource::collection($artist)], 200);
     }
 
-    public function update(UpdateArtistRequest $reques, $artistId)
+    public function update(UpdateArtistRequest $reques, $artistId) // admin
     {
         $this->find($artistId)->update($reques->validated());
 
         return response()->json(['message' => 'Artist updated successfully '], 200);
     }
 
-    public function show($artistId)
+    public function show($artistId) // both
     {
         $artist = Artist::with('songs')->find($artistId);
         if (! $artist) {
@@ -52,7 +61,7 @@ class ArtistController extends Controller
 
     }
 
-    public function delete($artistId)
+    public function delete($artistId) // admin
     {
         $this->find($artistId)->delete();
 

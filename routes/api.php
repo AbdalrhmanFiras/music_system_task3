@@ -3,14 +3,12 @@
 use App\Http\Controllers\ArtistController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SongController;
+use App\Http\Controllers\UserAdminController;
 use App\Http\Controllers\UserController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
 
 Route::prefix('auth')->group(function () {
 
@@ -22,8 +20,6 @@ Route::prefix('auth')->group(function () {
         Route::get('me', [AuthController::class, 'me']);
     });
 });
-Route::post('user/import', [UserController::class, 'userImportFile'])
-    ->middleware('auth:api');
 
 Route::middleware('auth:api')->group(function () {
 
@@ -51,6 +47,35 @@ Route::middleware('auth:api')->group(function () {
         Route::get('{songId}', [SongController::class, 'show']);
         Route::put('{songId}', [SongController::class, 'update']);
         Route::delete('{songId}', [SongController::class, 'delete']);
+    });
+
+    Route::prefix('admin')->group(function () {
+
+        Route::prefix('roles')->group(function () {
+            Route::get('/', [RoleController::class, 'index']);
+            Route::post('/', [RoleController::class, 'store']);
+            Route::get('/{roleId}', [RoleController::class, 'show']);
+            Route::put('/{roleId}', [RoleController::class, 'update']);
+            Route::delete('/{roleId}', [RoleController::class, 'delete']);
+        });
+
+        Route::prefix('permissions')->group(function () {
+            Route::get('/', [PermissionController::class, 'index']);
+            Route::post('/', [PermissionController::class, 'store']);
+            Route::get('/{permissionId}', [PermissionController::class, 'show']);
+            Route::put('/{permissionId}', [PermissionController::class, 'update']);
+            Route::delete('/{permissionId}', [PermissionController::class, 'delete']);
+        });
+
+        Route::prefix('users')->group(function () {
+            Route::get('/{userId}/roles', [UserAdminController::class, 'getUserRole']);
+            Route::post('/{userId}/assign-role', [UserAdminController::class, 'assignRole']);
+            Route::post('/{userId}/assign-permission', [UserAdminController::class, 'assignPermission']);
+            Route::put('/{userId}/update-role', [UserAdminController::class, 'updateRole']);
+            Route::put('/{userId}/update-permission', [UserAdminController::class, 'updatePermission']);
+            Route::post('user/import', [UserController::class, 'userImportFile']);
+
+        });
     });
 
 });
