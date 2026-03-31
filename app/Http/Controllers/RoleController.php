@@ -38,7 +38,7 @@ class RoleController extends Controller
         $role = Role::create(['name' => $data['name']]);
 
         if ($request->has('permissions')) {
-            $role->syncPermissions($request->validated()['permissions']);
+            $role->syncPermissions($request->validated('permissions'));
         }
 
         return response()->json(['message' => 'Role created successfully'], 201);

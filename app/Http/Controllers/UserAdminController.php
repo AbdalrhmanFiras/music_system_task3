@@ -30,7 +30,10 @@ class UserAdminController extends Controller
 
     public function getUserRole($userId)
     {
-        $user = User::with('roles.permissions')->findOrFail($userId);
+        $user = User::with('roles.permissions')->find($userId);
+        if (! $user) {
+            return abort(404, 'user not found');
+        }
 
         return RoleResource::collection($user->roles);
     }
@@ -38,7 +41,7 @@ class UserAdminController extends Controller
     public function assignRole(RoleRequest $request, $userId)
     {
         $user = $this->find($userId);
-        $role = Role::findByName($request->validated()['role']);
+        $role = Role::findByName($request->validated('role'));
         $user->assignRole($role);
 
         return response()->json(['message' => 'Role added to user'], 200);
@@ -47,7 +50,7 @@ class UserAdminController extends Controller
     public function assignPermission(PermissionRequest $request, $userId)
     {
         $user = $this->find($userId);
-        $permission = Permission::findByName($request->validated()['permission']);
+        $permission = Permission::findByName($request->validated('permission'));
         $user->givePermissionTo($permission);
 
         return response()->json(['message' => 'Permission added to user'], 200);
@@ -57,7 +60,7 @@ class UserAdminController extends Controller
     {
         $user = $this->find($userId);
 
-        $user->syncPermissions($request->validated()['permissions']);
+        $user->syncPermissions($request->validated('permissions'));
 
         return response()->json(['message' => 'Permission updated successfully'], 200);
     }
@@ -66,7 +69,7 @@ class UserAdminController extends Controller
     {
         $user = $this->find($userId);
 
-        $user->syncRoles($request->validated()['role']);
+        $user->syncRoles($request->validated('role'));
 
         return response()->json(['message' => 'Role updated successfully'], 200);
     }
