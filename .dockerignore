@@ -10,3 +10,4 @@ storage/framework/views
 .gitattributes
 README.md
 tests
+bootstrap/cache/*.php
