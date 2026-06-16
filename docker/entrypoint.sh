@@ -73,5 +73,9 @@ php artisan storage:link --force || true
 
 echo "Application is ready!"
 
+# Fix permissions again after artisan commands have run as root
+chown -R www-data:www-data storage bootstrap/cache
+chmod -R 775 storage bootstrap/cache
+
 # Start the container process (supervisord)
 exec "$@"
