@@ -67,6 +67,7 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
 # Copy nginx and supervisor configs into image
 COPY ./docker/nginx/app.conf /etc/nginx/conf.d/default.conf
 COPY ./docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+RUN rm -f /etc/nginx/sites-enabled/default
 
 # Copy and enable entrypoint
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
