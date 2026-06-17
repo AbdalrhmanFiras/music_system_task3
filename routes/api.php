@@ -8,6 +8,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SongController;
 use App\Http\Controllers\UserAdminController;
 use App\Http\Controllers\UserController;
+use Dedoc\Scramble\Scramble;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -79,3 +80,10 @@ Route::middleware('auth:api')->group(function () {
     });
 
 });
+
+// Include all routes in Scramble documentation (not only routes matching configured api_path)
+Scramble::routes(fn ($route) => true);
+
+// Register Scramble API documentation routes (UI and JSON spec)
+Scramble::registerUiRoute(path: 'docs/api')->name('scramble.docs.ui');
+Scramble::registerJsonSpecificationRoute(path: 'docs/api.json')->name('scramble.docs.document');
