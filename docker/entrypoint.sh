@@ -11,9 +11,8 @@ mkdir -p storage/framework/cache/data \
     storage/logs \
     bootstrap/cache
 
-# Fix permissions
-chown -R www-data:www-data storage bootstrap/cache
-chmod -R 775 storage bootstrap/cache
+# Fix permissions to avoid Docker volume permission issues
+chmod -R 777 storage bootstrap/cache
 
 # Wait for database connection (max 60 seconds)
 if [ -n "$DB_HOST" ]; then
@@ -58,6 +57,12 @@ if [ -z "$APP_KEY" ] || [ "$APP_KEY" = "" ]; then
     php artisan key:generate --force
 fi
 
+# Generate JWT secret if not set
+if [ -z "$JWT_SECRET" ] || [ "$JWT_SECRET" = "" ]; then
+    echo "Generating JWT secret..."
+    php artisan jwt:secret --force || true
+fi
+
 # Run database migrations
 echo "Running migrations..."
 php artisan migrate --force || echo "WARNING: Migrations failed, continuing..."
@@ -74,8 +79,7 @@ php artisan storage:link --force || true
 echo "Application is ready!"
 
 # Fix permissions again after artisan commands have run as root
-chown -R www-data:www-data storage bootstrap/cache
-chmod -R 775 storage bootstrap/cache
+chmod -R 777 storage bootstrap/cache
 
 # Start the container process (supervisord)
 exec "$@"
